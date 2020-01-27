@@ -1,0 +1,46 @@
+/* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+#map {
+  height: 100%;
+}
+/* Optional: Makes the sample page fill the window. */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.intersection-ui{
+  margin: 0px;
+  line-height: 60px;
+  padding: 0 40px;
+  background: white;
+  border: none;
+}
+
+.intersection-ui:hover{
+  background: lightgrey;
+}
+.intersection-text{
+  front-family: Verdana,Arial,sans-serif;
+  font-size: 20px;
+  padding: 4px;
+}
+
+
+.union-ui{
+  margin: 0px;
+  line-height: 60px;
+  padding: 0 40px;
+  background: white;
+  border: none;
+}
+
+.union-ui:hover{
+  background: silver;
+}
+.union-ui{
+  front-family: Verdana,Arial,sans-serif;
+  font-size: 20px;
+  padding: 4px;
+}
