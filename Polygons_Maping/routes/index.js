@@ -9,7 +9,7 @@ router.use(
 );
 
 router.get('/map', function (request, response) {
-    response.sendFile('map.html', {root: 'Polygons_Mapping/views'});
+    response.sendFile('map.html', {root: 'Polygons_Maping/views'});
 });
 
 module.exports = router;
