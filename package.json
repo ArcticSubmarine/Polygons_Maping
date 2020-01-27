@@ -1,0 +1,15 @@
+{
+  "name": "Polygons_Mapping",
+  "version": "1.0.0",
+  "dependencies": {
+    "body-parser": "latest",
+    "express": "^4.17.1",
+    "google": "^2.1.0",
+    "http-errors": "^1.7.3",
+    "morgan": "^1.9.1",
+    "pug": "^2.0.4"
+  },
+  "devDependencies": {
+    "cookie-parser": "^1.4.4"
+  }
+}
