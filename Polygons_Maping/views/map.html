@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../stylesheets/style.css">
+</head>
+<body>
+<button id="intersection-div" class="intersection-div">
+    <div id= "intersection-ui" class="intersection-ui" title = "Click to show the intersection of to polygons">
+        <div id="intersection-text" class="intersection-text">
+            <p> Intersections </p>
+        </div>
+    </div>
+</button>
+<button id="unionRB-div" class="unionRB-div">
+    <div id= "union-ui" class="union-ui" title = "Click to show the unions of red and blue polygons">
+        <div id="union-text" class="union-text">
+            <p> Union RED/BLUE </p>
+        </div>
+    </div>
+</button>
+<button id="unionRY-div" class="unionRY-div">
+    <div id= "union-ui" class="union-ui" title = "Click to show the unions of red and blue polygons">
+        <div id="union-text" class="union-text">
+            <p> Union RED/YELLOW </p>
+        </div>
+    </div>
+</button>
+<button id="unionBY-div" class="unionBY-div">
+    <div id= "union-ui" class="union-ui" title = "Click to show the unions of red and blue polygons">
+        <div id="union-text" class="union-text">
+            <p> Union BLUE/YELLOW </p>
+        </div>
+    </div>
+</button>
+<div id="map">
+<script type="text/javascript" src="../js/polygons.js"></script>
+<script>
+    var google = require('google');
+    var map;
+
+    function initMap() {
+        //Set parameters of the map
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 15,
+            center: {lat: -0.13, lng:  51.51}
+        });
+
+        // Construct polygons.
+        var polygon1 = new google.maps.Polygon({
+            paths: polygon1_coord,
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35
+        });
+
+        var polygon2 = new google.maps.Polygon({
+            paths: polygon2_coord,
+            strokeColor: '#2f25ff',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#2f25ff',
+            fillOpacity: 0.35
+        });
+
+        var polygon3 = new google.maps.Polygon({
+            paths: polygon3_coord,
+            strokeColor: '#ffff36',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#ffff36',
+            fillOpacity: 0.35
+        });
+
+        //Display polygons on the map
+        polygon1.setMap(map);
+        polygon2.setMap(map);
+        polygon3.setMap(map);
+
+
+        var geometryFactory = new jsts.geom.GeometryFactory();
+        var figPol1 = createJstsPolygon(geometryFactory, polygon1);
+        var figPol2 = createJstsPolygon(geometryFactory, polygon2);
+        var figPol3 = createJstsPolygon(geometryFactory, polygon3);
+
+
+        function ErasePolygons() {
+            polygon1.setMap(null);
+            polygon2.setMap(null);
+            polygon3.setMap(null);
+        }
+
+        //Management of intersections
+        document.getElementById("intersection-div").addEventListener("click", function () {
+            ErasePolygons();
+            var intersection12 = figPol1.intersection(figPol2);
+            var intersection13 = figPol1.intersection(figPol3);
+            var intersection23 = figPol2.intersection(figPol3);
+            drawIntersectionArea(map, intersection12);
+            drawIntersectionArea(map, intersection13);
+            drawIntersectionArea(map, intersection23);
+        });
+        document.getElementById("intersection-div").index = 1;
+        //End of management of intersections
+
+        //Management of unions
+        //Union of polygons 1 & 2
+        document.getElementById("unionRB-div").addEventListener("click", function () {
+            var union12 = figPol1.union(figPol2);
+            ErasePolygons();
+            drawUnionArea(map, union12, '#a041ff');
+        });
+        document.getElementById("unionRB-div").index = 1;
+
+        //Union of polygons 1 & 3
+        document.getElementById("unionRY-div").addEventListener("click", function () {
+            var union13 = figPol1.union(figPol3);
+            ErasePolygons();
+            drawUnionArea(map, union13, '#ff993a');
+        });
+        document.getElementById("unionRY-div").index = 1;
+
+        //Union of polygons 2 & 3
+        document.getElementById("unionBY-div").addEventListener("click", function () {
+            var union23 = figPol2.union(figPol3);
+            ErasePolygons();
+            drawUnionArea(map, union23, '#20b2aa');
+        });
+        document.getElementById("unionBY-div").index = 1;
+
+
+    }
+//Functions for intersection & union management
+//Creates the intersection shape
+function drawIntersectionArea(map, polygon) {
+    var coords = polygon.getCoordinates().map(function (coord) {
+        return { lat: coord.x, lng: coord.y };
+    });
+
+    var intersectionArea = new google.maps.Polygon({
+        paths: coords,
+        strokeColor: '#464d48',
+        strokeOpacity: 0.8,
+        strokeWeight: 4,
+        fillColor: '#464d48',
+        fillOpacity: 0.35
+    });
+    intersectionArea.setMap(map);
+}
+
+//Converts geoJson-like path to jsts path
+function createJstsPolygon(geometryFactory, polygon) {
+    var path = polygon.getPath();
+    var coordinates = path.getArray().map(function name(coord) {
+        return new jsts.geom.Coordinate(coord.lat(), coord.lng());
+    });
+    if(coordinates[0].compareTo(coordinates[coordinates.length-1]) !== 0)
+        coordinates.push(coordinates[0]);
+    var shell = geometryFactory.createLinearRing(coordinates);
+    return geometryFactory.createPolygon(shell);
+}
+
+//Create the union shape
+function drawUnionArea(map, polygon, color) {
+    var coords = polygon.getCoordinates().map(function (coord) {
+        return { lat: coord.x, lng: coord.y };
+    });
+
+    var unionArea = new google.maps.Polygon({
+        paths: coords,
+        strokeColor: color,
+        strokeOpacity: 0.8,
+        strokeWeight: 4,
+        fillColor: color,
+        fillOpacity: 0.35
+    });
+    unionArea.setMap(map);
+}
+//End of functions for intersection & union management
+
+
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=MY_KEY&callback=initMap"
+        async defer></script>
+<script src="https://cdn.rawgit.com/bjornharrtell/jsts/gh-pages/1.1.2/jsts.min.js"></script>
+</div>
+</body>
+</html>
